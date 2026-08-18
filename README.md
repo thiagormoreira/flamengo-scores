@@ -55,4 +55,6 @@ flamengo-scores/
 
 ## Licença
 
-MIT
+GPL-3.0-or-later
+
+O escudo do Flamengo (flamengo.svg) é marca registrada do Clube de Regatas do Flamengo.

@@ -22,17 +22,23 @@ let extension;
 export default class FlamengoScoresExtension extends Extension {
   enable() {
     extension = this;
+    this._enabled = true;
     this._settings = this.getSettings();
     this._indicator = new FlamengoIndicator(this.path);
     Main.panel.addToStatusArea(this.metadata.uuid, this._indicator);
     this._fetchData();
-    this._timeout = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, POLL_INTERVAL_NORMAL, () => {
+    this._setPollInterval(POLL_INTERVAL_NORMAL);
+    this._settingsChangedId = this._settings.connect('changed::refresh-interval', () => {
       this._fetchData();
-      return GLib.SOURCE_CONTINUE;
     });
   }
 
   disable() {
+    this._enabled = false;
+    if (this._settingsChangedId) {
+      this._settings.disconnect(this._settingsChangedId);
+      this._settingsChangedId = null;
+    }
     if (this._timeout) {
       GLib.source_remove(this._timeout);
       this._timeout = null;
@@ -89,7 +95,9 @@ export default class FlamengoScoresExtension extends Extension {
     this._indicator?.updateLive(live);
     this._indicator?.updateMatches(upcoming.slice(0, MAX_MATCHES));
 
-    this._setPollInterval(live.length > 0 ? POLL_INTERVAL_LIVE : POLL_INTERVAL_NORMAL);
+    this._setPollInterval(live.length > 0
+      ? POLL_INTERVAL_LIVE
+      : Math.max(this._settings?.get_int('refresh-interval') ?? POLL_INTERVAL_NORMAL, 15));
   }
 
   _apiCall(url, callback) {
@@ -247,9 +255,5 @@ class FlamengoIndicator extends PanelMenu.Button {
 
       this._label.set_text(`${homeScore} x ${awayScore}`);
     });
-  }
-
-  showError(msg) {
-    this._label.set_text(msg);
   }
 });

@@ -136,7 +136,7 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
       icon_name: 'external-link-symbolic',
     }));
     githubLinkRow.connect('activated', () => {
-      Gtk.show_uri(window, 'https://github.com/loganguns/flamengo-scores/issues', 0);
+      Gtk.show_uri(window, 'https://github.com/thiagormoreira/flamengo-scores/issues', 0);
     });
     docsGroup.add(githubLinkRow);
   }
