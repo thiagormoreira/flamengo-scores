@@ -93,20 +93,20 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     window.add(pageSupport);
 
     const apiGroup2 = new Adw.PreferencesGroup({
-      title: 'API-Football',
-      description: 'Obtenha sua chave gratuita no dashboard',
+      title: 'TheSportsDB',
+      description: 'API gratuita sem cadastro usada pela extensão',
     });
     pageSupport.add(apiGroup2);
 
     const apiLinkRow = new Adw.ActionRow({
-      title: 'Dashboard da API',
+      title: 'Site da TheSportsDB',
       activatable: true,
     });
     apiLinkRow.add_suffix(new Gtk.Image({
       icon_name: 'external-link-symbolic',
     }));
     apiLinkRow.connect('activated', () => {
-      Gtk.show_uri(window, 'https://dashboard.api-football.com', 0);
+      Gtk.show_uri(window, 'https://www.thesportsdb.com', 0);
     });
     apiGroup2.add(apiLinkRow);
 
@@ -124,7 +124,7 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
       icon_name: 'external-link-symbolic',
     }));
     docsLinkRow.connect('activated', () => {
-      Gtk.show_uri(window, 'https://www.api-football.com/documentation-v3', 0);
+      Gtk.show_uri(window, 'https://www.thesportsdb.com/api.php', 0);
     });
     docsGroup.add(docsLinkRow);
 
