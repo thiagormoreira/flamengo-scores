@@ -30,13 +30,13 @@ gnome-extensions disable flamengo-scores@loganguns && gnome-extensions enable fl
 
 ## Configuração
 
-Não é necessária nenhuma chave de API — a extensão usa a TheSportsDB gratuita. As preferências (abas General/About/Support) estão disponíveis no GNOME Extensions App.
+Não é necessária nenhuma chave de API — a extensão usa a ESPN gratuita. As preferências (abas General/About/Support) estão disponíveis no GNOME Extensions App.
 
 ## API Usage
 
-A extensão usa a TheSportsDB (gratuita, sem chave):
-- **Endpoint**: `/api/v1/json/123/eventsnext.php?id=134287` para próximos jogos
-- **Placar ao vivo**: polling de `/lookupevent.php?id=<idEvent>` a cada 30s durante o jogo
+A extensão usa a ESPN (gratuita, sem chave):
+- **Endpoint**: `site.api.espn.com/apis/site/v2/sports/soccer/{liga}/scoreboard?dates=YYYYMMDD-YYYYMMDD` para próximos jogos e placar ao vivo
+- **Ligas consultadas**: `bra.1` (Brasileirão) e `conmebol.libertadores` (Libertadores)
 - **Polling**: 30s durante jogos, 1h quando ocioso
 
 ## Estrutura
@@ -52,13 +52,6 @@ flamengo-scores/
 │   └── org.gnome.shell.extensions.flamengo-scores.gschema.xml
 └── README.md
 ```
-
-## API Usage
-
-A extensão usa a API-Football v3:
-- **Endpoint**: `/v3/fixtures` para jogos e `/v3/fixtures?id=X` para placar ao vivo
-- **Rate limit**: 100 requisições/dia (plano gratuito)
-- **Polling**: 30s durante jogos, intervalo configurável quando ocioso
 
 ## Licença
 
