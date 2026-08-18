@@ -2,7 +2,7 @@
   "uuid": "flamengo-scores@loganguns",
   "name": "Flamengo Scores",
   "description": "Mostra próximos jogos do Flamengo e placar ao vivo",
-  "version": 2,
+  "version": 3,
   "shell-version": ["46", "47", "48", "49", "50"],
   "url": "https://github.com/thiagormoreira/flamengo-scores",
   "settings-schema": "org.gnome.shell.extensions.flamengo-scores",
