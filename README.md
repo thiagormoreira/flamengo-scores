@@ -4,16 +4,14 @@ Extensão GNOME Shell para acompanhar jogos do Flamengo em tempo real.
 
 ## Funcionalidades
 
-- **Placar ao vivo** — Mostra gols e tempo durante jogos em andamento
-- **Próximos jogos** — Lista os próximos 5 jogos do Flamengo
+- **Placar ao vivo** — Mostra gols e status durante jogos em andamento
+- **Próximos jogos** — Lista os próximos jogos do Flamengo
 - **Atualização automática** — Polling a cada 30s durante jogos, 1h quando ocioso
-- **Ícone do escudo** —盾牌 do Flamengo no painel do GNOME
+- **Ícone do escudo** — Escudo do Flamengo no painel do GNOME
 
 ## Requisitos
 
 - GNOME Shell 46+
-- API key da API-Football (plano gratuito: 100 requisições/dia)
-- Team ID do Flamengo: **1953**
 
 ## Instalação
 
@@ -32,16 +30,14 @@ gnome-extensions disable flamengo-scores@loganguns && gnome-extensions enable fl
 
 ## Configuração
 
-1. Abra as preferências da extensão em GNOME Extensions App
-2. Vá na aba **General**
-3. Insira sua API key da API-Football
-4. Ajuste o intervalo de atualização conforme necessidade
+Não é necessária nenhuma chave de API — a extensão usa a TheSportsDB gratuita. As preferências (abas General/About/Support) estão disponíveis no GNOME Extensions App.
 
-## Obter API Key
+## API Usage
 
-1. Acesse [dashboard.api-football.com](https://dashboard.api-football.com)
-2. Crie uma conta gratuita
-3. Copie sua API key e cole nas preferências
+A extensão usa a TheSportsDB (gratuita, sem chave):
+- **Endpoint**: `/api/v1/json/123/eventsnext.php?id=134287` para próximos jogos
+- **Placar ao vivo**: polling de `/lookupevent.php?id=<idEvent>` a cada 30s durante o jogo
+- **Polling**: 30s durante jogos, 1h quando ocioso
 
 ## Estrutura
 
@@ -50,7 +46,7 @@ flamengo-scores/
 ├── extension.js      # Lógica principal da extensão
 ├── prefs.js          # Interface de preferências (Adw)
 ├── metadata.json     # Metadados da extensão
-├── flamengo.svg      #盾牌 do Flamengo
+├── flamengo.svg      # Escudo do Flamengo
 ├── stylesheet.css    # Estilos CSS
 ├── schemas/
 │   └── org.gnome.shell.extensions.flamengo-scores.gschema.xml

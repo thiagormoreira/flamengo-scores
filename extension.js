@@ -9,11 +9,11 @@ import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
 
-const FLAMENGO_TEAM_ID = 1953;
-const BRASILEIRAO_LEAGUE_ID = 71;
-const API_BASE = 'https://v3.football.api-sports.io';
+const FLAMENGO_TEAM_ID = 134287;
+const API_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
 const POLL_INTERVAL_NORMAL = 3600;
 const POLL_INTERVAL_LIVE = 30;
+const LIVE_STATUS = ['1H', 'HT', '2H', 'ET', 'P', 'BT', 'LIVE'];
 
 let extension;
 
@@ -21,6 +21,7 @@ export default class FlamengoScoresExtension extends Extension {
   enable() {
     extension = this;
     this._settings = this.getSettings();
+    this._nextEventId = null;
     this._indicator = new FlamengoIndicator(this.path);
     Main.panel.addToStatusArea(this.metadata.uuid, this._indicator);
     this._fetchData();
@@ -43,48 +44,49 @@ export default class FlamengoScoresExtension extends Extension {
   }
 
   _fetchData() {
-    const apiKey = this._settings.get_string('api-key');
-    if (!apiKey || apiKey === '') {
-      this._indicator?.showError('Configure API key');
-      return;
-    }
-
-    this._fetchNextMatches(apiKey);
-    this._fetchLiveMatch(apiKey);
+    this._fetchNextMatches();
+    this._fetchLiveMatch();
   }
 
-  _fetchNextMatches(apiKey) {
-    const url = `${API_BASE}/fixtures?team=${FLAMENGO_TEAM_ID}&next=5`;
-    this._apiCall(url, apiKey, (data) => {
-      if (data && data.response) {
-        this._indicator?.updateMatches(data.response);
+  _fetchNextMatches() {
+    const url = `${API_BASE}/eventsnext.php?id=${FLAMENGO_TEAM_ID}`;
+    this._apiCall(url, (data) => {
+      if (data && data.events) {
+        this._indicator?.updateMatches(data.events);
+        if (data.events.length > 0) {
+          this._nextEventId = data.events[0].idEvent;
+        }
       }
     });
   }
 
-  _fetchLiveMatch(apiKey) {
-    const url = `${API_BASE}/fixtures?live=all`;
-    this._apiCall(url, apiKey, (data) => {
-      if (data && data.response) {
-        const liveMatches = data.response.filter(m => 
-          m.teams.home.id === FLAMENGO_TEAM_ID || m.teams.away.id === FLAMENGO_TEAM_ID
-        );
-        this._indicator?.updateLive(liveMatches);
-        if (liveMatches.length > 0) {
+  _fetchLiveMatch() {
+    if (!this._nextEventId) {
+      this._indicator?.updateLive([]);
+      this._setPollInterval(POLL_INTERVAL_NORMAL);
+      return;
+    }
+
+    const url = `${API_BASE}/lookupevent.php?id=${this._nextEventId}`;
+    this._apiCall(url, (data) => {
+      if (data && data.events && data.events.length > 0) {
+        const event = data.events[0];
+        if (LIVE_STATUS.includes(event.strStatus)) {
+          this._indicator?.updateLive([event]);
           this._setPollInterval(POLL_INTERVAL_LIVE);
         } else {
+          this._indicator?.updateLive([]);
           this._setPollInterval(POLL_INTERVAL_NORMAL);
         }
       }
     });
   }
 
-  _apiCall(url, apiKey, callback) {
+  _apiCall(url, callback) {
     try {
       const session = new Soup.Session();
       const message = Soup.Message.new('GET', url);
-      message.request_headers.append('x-apisports-key', apiKey);
-      
+
       session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null, (session, result) => {
         try {
           const bytes = session.send_and_read_finish(result);
@@ -134,7 +136,7 @@ class FlamengoIndicator extends PanelMenu.Button {
     this._box.add_child(this._icon);
     
     this._label = new St.Label({
-      text: 'Fla',
+      text: '',
       y_expand: true,
       y_align: Clutter.ActorAlign.CENTER,
     });
@@ -172,34 +174,39 @@ class FlamengoIndicator extends PanelMenu.Button {
       return;
     }
 
-    matches.forEach(match => {
-      const date = new Date(match.fixture.date);
-      const dateStr = date.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
-      const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const home = match.teams.home.name;
-      const away = match.teams.away.name;
-      const homeScore = match.goals.home ?? '-';
-      const awayScore = match.goals.away ?? '-';
-      const status = match.fixture.status.short;
+    matches.forEach(event => {
+      const dateEvent = event.dateEventLocal || event.dateEvent;
+      const timeEvent = event.strTimeLocal || event.strTime;
+      const [yy, mm, dd] = (dateEvent || '').split('-');
+      const dateStr = dd && mm ? `${dd}/${mm}` : dateEvent || '';
+      const timeStr = timeEvent ? timeEvent.slice(0, 5) : '';
+      const home = event.strHomeTeam;
+      const away = event.strAwayTeam;
+      const homeScore = event.intHomeScore ?? '-';
+      const awayScore = event.intAwayScore ?? '-';
+      const status = event.strStatus;
+      const league = event.strLeague || '';
       
       let text;
-      if (['1H', 'HT', '2H', 'ET', 'P', 'BT'].includes(status)) {
+      if (LIVE_STATUS.includes(status)) {
         text = `AO VIVO: ${home} ${homeScore} x ${awayScore} ${away}`;
       } else if (status === 'FT') {
         text = `${dateStr} ${home} ${homeScore} x ${awayScore} ${away}`;
       } else {
-        text = `${dateStr} ${timeStr} - ${home} x ${away}`;
+        text = `${dateStr} ${timeStr} - ${home} x ${away}${league ? ` (${league})` : ''}`;
       }
       
       const item = new PopupMenu.PopupMenuItem(text);
       this._matchesSection.addMenuItem(item);
     });
     
-    const nextMatch = matches.find(m => ['NS', 'TBD'].includes(m.fixture.status.short));
+    const nextMatch = matches.find(e => !LIVE_STATUS.includes(e.strStatus) && e.strStatus !== 'FT');
     if (nextMatch) {
-      const date = new Date(nextMatch.fixture.date);
-      const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+      const dateEvent = nextMatch.dateEventLocal || nextMatch.dateEvent;
+      const timeEvent = nextMatch.strTimeLocal || nextMatch.strTime;
+      const [yy, mm, dd] = (dateEvent || '').split('-');
+      const dateStr = dd && mm ? `${dd}/${mm}` : dateEvent || '';
+      const timeStr = timeEvent ? timeEvent.slice(0, 5) : '';
       this._label.set_text(`${dateStr} ${timeStr}`);
     }
   }
@@ -211,14 +218,14 @@ class FlamengoIndicator extends PanelMenu.Button {
       return;
     }
     
-    matches.forEach(match => {
-      const home = match.teams.home.name;
-      const away = match.teams.away.name;
-      const homeScore = match.goals.home ?? 0;
-      const awayScore = match.goals.away ?? 0;
-      const elapsed = match.fixture.status.elapsed ?? 0;
+    matches.forEach(event => {
+      const home = event.strHomeTeam;
+      const away = event.strAwayTeam;
+      const homeScore = event.intHomeScore ?? 0;
+      const awayScore = event.intAwayScore ?? 0;
+      const status = event.strStatus;
       
-      const text = `⚽ ${home} ${homeScore} x ${awayScore} ${away} (${elapsed}')`;
+      const text = `⚽ ${home} ${homeScore} x ${awayScore} ${away} (${status})`;
       const item = new PopupMenu.PopupMenuItem(text);
       this._liveSection.addMenuItem(item);
       

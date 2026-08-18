@@ -14,17 +14,14 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     window.add(pageGeneral);
 
     const apiGroup = new Adw.PreferencesGroup({
-      title: 'API Key',
-      description: 'Configure sua chave da API-Football',
+      title: 'Fonte de dados',
+      description: 'Usa a TheSportsDB gratuita — nenhuma chave necessária',
     });
     pageGeneral.add(apiGroup);
 
-    const apiKeyRow = new Adw.EntryRow({
-      title: 'Chave da API',
-    });
-    apiKeyRow.set_text(settings.get_string('api-key'));
-    apiKeyRow.connect('changed', () => {
-      settings.set_string('api-key', apiKeyRow.get_text());
+    const apiKeyRow = new Adw.ActionRow({
+      title: 'TheSportsDB (grátis)',
+      subtitle: 'Próximos jogos do Flamengo sem cadastro',
     });
     apiGroup.add(apiKeyRow);
 
@@ -66,7 +63,7 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     });
     const meta = this.metadata;
     versionRow.add_suffix(new Gtk.Label({
-      label: meta.version ?? '1.0.0',
+      label: String(meta.version ?? '1.0.0'),
       css_classes: ['dim-label'],
     }));
     aboutGroup.add(versionRow);
