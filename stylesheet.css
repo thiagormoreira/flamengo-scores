@@ -1,0 +1,12 @@
+.flamengo-scores-panel {
+  padding: 0 4px;
+}
+
+.flamengo-live {
+  color: #e31d1d;
+  font-weight: bold;
+}
+
+.flamengo-next {
+  color: #ffd700;
+}

@@ -1,0 +1,10 @@
+{
+  "uuid": "flamengo-scores@loganguns",
+  "name": "Flamengo Scores",
+  "description": "Mostra próximos jogos do Flamengo e placar ao vivo",
+  "version": 1,
+  "shell-version": ["46", "47", "48", "49", "50"],
+  "url": "",
+  "settings-schema": "org.gnome.shell.extensions.flamengo-scores",
+  "gettext-domain": "flamengo-scores"
+}

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="org.gnome.shell.extensions.flamengo-scores"
+          path="/org/gnome/shell/extensions/flamengo-scores/">
+    <key name="api-key" type="s">
+      <default>''</default>
+      <summary>API Key</summary>
+      <description>Chave da API-Football (obter em dashboard.api-football.com)</description>
+    </key>
+    <key name="refresh-interval" type="i">
+      <default>60</default>
+      <summary>Refresh Interval</summary>
+      <description>Intervalo de atualização em segundos</description>
+      <range min="15" max="3600"/>
+    </key>
+  </schema>
+</schemalist>
