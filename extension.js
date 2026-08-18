@@ -4,7 +4,7 @@ import Gio from 'gi://Gio';
 import GLib from 'gi://GLib';
 import Clutter from 'gi://Clutter';
 import Soup from 'gi://Soup';
-import {Extension, gettext as _} from 'resource:///org/gnome/shell/extensions/extension.js';
+import {Extension} from 'resource:///org/gnome/shell/extensions/extension.js';
 import * as PanelMenu from 'resource:///org/gnome/shell/ui/panelMenu.js';
 import * as Main from 'resource:///org/gnome/shell/ui/main.js';
 import * as PopupMenu from 'resource:///org/gnome/shell/ui/popupMenu.js';
@@ -85,6 +85,8 @@ export default class FlamengoScoresExtension extends Extension {
   }
 
   _processEvents(events) {
+    if (!this._enabled) return;
+
     events.sort((a, b) => a.date.localeCompare(b.date));
 
     const live = events.filter(e =>
