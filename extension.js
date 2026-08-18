@@ -96,6 +96,7 @@ export default class FlamengoScoresExtension extends Extension {
     try {
       const session = new Soup.Session();
       const message = Soup.Message.new('GET', url);
+      message.get_request_headers().append('User-Agent', 'curl/8.18.0');
 
       session.send_and_read_async(message, GLib.PRIORITY_DEFAULT, null, (session, result) => {
         try {
