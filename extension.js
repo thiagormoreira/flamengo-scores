@@ -165,6 +165,15 @@ class FlamengoIndicator extends PanelMenu.Button {
     this.menu.addMenuItem(settingsItem);
   }
 
+  _formatEventTime(event) {
+    const ts = event.strTimestamp || `${event.dateEvent}T${event.strTime}`;
+    const date = new Date(ts.endsWith('Z') ? ts : ts + 'Z');
+    if (isNaN(date.getTime())) return '';
+    const dateStr = date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+    const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    return `${dateStr} ${timeStr}`;
+  }
+
   updateMatches(matches) {
     this._matchesSection.removeAll();
     
@@ -175,11 +184,8 @@ class FlamengoIndicator extends PanelMenu.Button {
     }
 
     matches.forEach(event => {
-      const dateEvent = event.dateEventLocal || event.dateEvent;
-      const timeEvent = event.strTimeLocal || event.strTime;
-      const [yy, mm, dd] = (dateEvent || '').split('-');
-      const dateStr = dd && mm ? `${dd}/${mm}` : dateEvent || '';
-      const timeStr = timeEvent ? timeEvent.slice(0, 5) : '';
+      const dateStr = this._formatEventTime(event).split(' ')[0] || '';
+      const timeStr = this._formatEventTime(event).split(' ')[1] || '';
       const home = event.strHomeTeam;
       const away = event.strAwayTeam;
       const homeScore = event.intHomeScore ?? '-';
@@ -202,12 +208,8 @@ class FlamengoIndicator extends PanelMenu.Button {
     
     const nextMatch = matches.find(e => !LIVE_STATUS.includes(e.strStatus) && e.strStatus !== 'FT');
     if (nextMatch) {
-      const dateEvent = nextMatch.dateEventLocal || nextMatch.dateEvent;
-      const timeEvent = nextMatch.strTimeLocal || nextMatch.strTime;
-      const [yy, mm, dd] = (dateEvent || '').split('-');
-      const dateStr = dd && mm ? `${dd}/${mm}` : dateEvent || '';
-      const timeStr = timeEvent ? timeEvent.slice(0, 5) : '';
-      this._label.set_text(`${dateStr} ${timeStr}`);
+      const formatted = this._formatEventTime(nextMatch);
+      if (formatted) this._label.set_text(formatted);
     }
   }
 
