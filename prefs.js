@@ -15,12 +15,12 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
 
     const apiGroup = new Adw.PreferencesGroup({
       title: 'Fonte de dados',
-      description: 'Usa a TheSportsDB gratuita — nenhuma chave necessária',
+      description: 'Usa a ESPN gratuita — nenhuma chave necessária',
     });
     pageGeneral.add(apiGroup);
 
     const apiKeyRow = new Adw.ActionRow({
-      title: 'TheSportsDB (grátis)',
+      title: 'ESPN (grátis)',
       subtitle: 'Próximos jogos do Flamengo sem cadastro',
     });
     apiGroup.add(apiKeyRow);
@@ -93,20 +93,20 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     window.add(pageSupport);
 
     const apiGroup2 = new Adw.PreferencesGroup({
-      title: 'TheSportsDB',
+      title: 'ESPN',
       description: 'API gratuita sem cadastro usada pela extensão',
     });
     pageSupport.add(apiGroup2);
 
     const apiLinkRow = new Adw.ActionRow({
-      title: 'Site da TheSportsDB',
+      title: 'Site da ESPN',
       activatable: true,
     });
     apiLinkRow.add_suffix(new Gtk.Image({
       icon_name: 'external-link-symbolic',
     }));
     apiLinkRow.connect('activated', () => {
-      Gtk.show_uri(window, 'https://www.thesportsdb.com', 0);
+      Gtk.show_uri(window, 'https://www.espn.com.br/futebol/', 0);
     });
     apiGroup2.add(apiLinkRow);
 
@@ -117,14 +117,14 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     pageSupport.add(docsGroup);
 
     const docsLinkRow = new Adw.ActionRow({
-      title: 'Documentação da API',
+      title: 'Documentação da API ESPN',
       activatable: true,
     });
     docsLinkRow.add_suffix(new Gtk.Image({
       icon_name: 'external-link-symbolic',
     }));
     docsLinkRow.connect('activated', () => {
-      Gtk.show_uri(window, 'https://www.thesportsdb.com/api.php', 0);
+      Gtk.show_uri(window, 'https://gist.github.com/akeaswaran/b48b02f1c94f873c6655e7129910fc3b', 0);
     });
     docsGroup.add(docsLinkRow);
 
