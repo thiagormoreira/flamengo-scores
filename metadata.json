@@ -4,7 +4,7 @@
   "description": "Mostra próximos jogos do Flamengo e placar ao vivo",
   "version": 2,
   "shell-version": ["46", "47", "48", "49", "50"],
-  "url": "",
+  "url": "https://github.com/thiagormoreira/flamengo-scores",
   "settings-schema": "org.gnome.shell.extensions.flamengo-scores",
   "gettext-domain": "flamengo-scores"
 }
