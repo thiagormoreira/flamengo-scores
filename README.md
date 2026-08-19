@@ -16,11 +16,11 @@ Extensão GNOME Shell para acompanhar jogos do Flamengo em tempo real.
 ## Instalação
 
 ```bash
-# Opção 1: copiar para o diretório de extensões
-cp -r * ~/.local/share/gnome-shell/extensions/flamengo-scores@loganguns/
-
-# Opção 2: usar o Makefile (se disponível)
+# Opção 1: usar o Makefile
 make install
+
+# Opção 2: copiar para o diretório de extensões
+cp -r * ~/.local/share/gnome-shell/extensions/flamengo-scores@loganguns/
 ```
 
 Depois reinicie a extensão:
@@ -47,6 +47,7 @@ flamengo-scores/
 ├── prefs.js          # Interface de preferências (Adw)
 ├── metadata.json     # Metadados da extensão
 ├── flamengo.svg      # Escudo do Flamengo
+├── Makefile          # pack/install/uninstall/logs
 ├── schemas/
 │   └── org.gnome.shell.extensions.flamengo-scores.gschema.xml
 └── README.md
