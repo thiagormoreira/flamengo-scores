@@ -47,7 +47,6 @@ flamengo-scores/
 ├── prefs.js          # Interface de preferências (Adw)
 ├── metadata.json     # Metadados da extensão
 ├── flamengo.svg      # Escudo do Flamengo
-├── stylesheet.css    # Estilos CSS
 ├── schemas/
 │   └── org.gnome.shell.extensions.flamengo-scores.gschema.xml
 └── README.md

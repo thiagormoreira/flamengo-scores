@@ -17,19 +17,19 @@ const POLL_INTERVAL_LIVE = 30;
 const LIVE_STATES = ['in'];
 const MAX_MATCHES = 5;
 
-let extension;
-
 export default class FlamengoScoresExtension extends Extension {
   enable() {
-    extension = this;
     this._enabled = true;
     this._settings = this.getSettings();
-    this._indicator = new FlamengoIndicator(this.path);
+    this._indicator = new FlamengoIndicator(this.path, this);
     Main.panel.addToStatusArea(this.metadata.uuid, this._indicator);
+    this._hasLiveMatches = false;
     this._fetchData();
     this._setPollInterval(POLL_INTERVAL_NORMAL);
     this._settingsChangedId = this._settings.connect('changed::refresh-interval', () => {
-      this._fetchData();
+      if (!this._hasLiveMatches) {
+        this._setPollInterval(Math.max(this._settings.get_int('refresh-interval'), 15));
+      }
     });
   }
 
@@ -97,6 +97,7 @@ export default class FlamengoScoresExtension extends Extension {
     this._indicator?.updateLive(live);
     this._indicator?.updateMatches(upcoming.slice(0, MAX_MATCHES));
 
+    this._hasLiveMatches = live.length > 0;
     this._setPollInterval(live.length > 0
       ? POLL_INTERVAL_LIVE
       : Math.max(this._settings?.get_int('refresh-interval') ?? POLL_INTERVAL_NORMAL, 15));
@@ -139,9 +140,11 @@ export default class FlamengoScoresExtension extends Extension {
 
 const FlamengoIndicator = GObject.registerClass(
 class FlamengoIndicator extends PanelMenu.Button {
-  _init(extensionPath) {
+  _init(extensionPath, extension) {
     super._init(0.0, '');
-    
+
+    this._extension = extension;
+
     this._box = new St.BoxLayout({
       style_class: 'panel-status-indicators-box',
     });
@@ -181,7 +184,7 @@ class FlamengoIndicator extends PanelMenu.Button {
     
     const settingsItem = new PopupMenu.PopupMenuItem('Configurações');
     settingsItem.connect('activate', () => {
-      extension?.openPreferences();
+      this._extension?.openPreferences();
     });
     this.menu.addMenuItem(settingsItem);
   }

@@ -1,13 +1,18 @@
 import Adw from 'gi://Adw';
 import Gtk from 'gi://Gtk';
+import GLib from 'gi://GLib';
 import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+
+const PIX_KEY = 'loganguns@gmail.com';
+const KOFI_URL = 'https://ko-fi.com/loganguns';
+const GITHUB_SPONSORS_URL = 'https://github.com/sponsors/thiagormoreira';
 
 export default class FlamengoScoresPreferences extends ExtensionPreferences {
   fillPreferencesWindow(window) {
     const settings = this.getSettings();
 
     const pageGeneral = new Adw.PreferencesPage({
-      title: 'General',
+      title: 'Geral',
       icon_name: 'preferences-other-symbolic',
     });
     window.add(pageGeneral);
@@ -46,7 +51,7 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     refreshGroup.add(refreshRow);
 
     const pageAbout = new Adw.PreferencesPage({
-      title: 'About',
+      title: 'Sobre',
       icon_name: 'dialog-information-symbolic',
     });
     window.add(pageAbout);
@@ -86,10 +91,73 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
     aboutGroup.add(shellRow);
 
     const pageSupport = new Adw.PreferencesPage({
-      title: 'Support',
+      title: 'Suporte',
       icon_name: 'help-browser-symbolic',
     });
     window.add(pageSupport);
+
+    const donateGroup = new Adw.PreferencesGroup({
+      title: 'Apoie o projeto',
+      description: 'Se essa extensão te ajuda a acompanhar o Mengão, considere apoiar',
+    });
+    pageSupport.add(donateGroup);
+
+    const pixRow = new Adw.ActionRow({
+      title: 'PIX',
+      subtitle: PIX_KEY,
+    });
+    const pixCopyButton = new Gtk.Button({
+      icon_name: 'edit-copy-symbolic',
+      valign: Gtk.Align.CENTER,
+      css_classes: ['flat'],
+      tooltip_text: 'Copiar chave PIX',
+    });
+    let pixResetTimeoutId = null;
+    pixCopyButton.connect('clicked', () => {
+      window.get_clipboard().set_text(PIX_KEY);
+      pixRow.subtitle = 'Chave copiada!';
+      if (pixResetTimeoutId) GLib.source_remove(pixResetTimeoutId);
+      pixResetTimeoutId = GLib.timeout_add_seconds(GLib.PRIORITY_DEFAULT, 2, () => {
+        pixRow.subtitle = PIX_KEY;
+        pixResetTimeoutId = null;
+        return GLib.SOURCE_REMOVE;
+      });
+    });
+    window.connect('close-request', () => {
+      if (pixResetTimeoutId) {
+        GLib.source_remove(pixResetTimeoutId);
+        pixResetTimeoutId = null;
+      }
+      return false;
+    });
+    pixRow.add_suffix(pixCopyButton);
+    donateGroup.add(pixRow);
+
+    const kofiRow = new Adw.ActionRow({
+      title: 'Ko-fi',
+      subtitle: 'ko-fi.com/loganguns',
+      activatable: true,
+    });
+    kofiRow.add_suffix(new Gtk.Image({
+      icon_name: 'external-link-symbolic',
+    }));
+    kofiRow.connect('activated', () => {
+      Gtk.show_uri(window, KOFI_URL, 0);
+    });
+    donateGroup.add(kofiRow);
+
+    const sponsorsRow = new Adw.ActionRow({
+      title: 'GitHub Sponsors',
+      subtitle: 'github.com/sponsors/thiagormoreira',
+      activatable: true,
+    });
+    sponsorsRow.add_suffix(new Gtk.Image({
+      icon_name: 'external-link-symbolic',
+    }));
+    sponsorsRow.connect('activated', () => {
+      Gtk.show_uri(window, GITHUB_SPONSORS_URL, 0);
+    });
+    donateGroup.add(sponsorsRow);
 
     const apiGroup2 = new Adw.PreferencesGroup({
       title: 'ESPN',
