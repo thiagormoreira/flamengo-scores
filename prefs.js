@@ -85,6 +85,12 @@ export default class FlamengoScoresPreferences extends ExtensionPreferences {
         });
         aboutGroup.add(emailRow);
 
+        const licenseRow = new Adw.ActionRow({
+            title: 'Licença',
+            subtitle: 'GPL-3.0-or-later',
+        });
+        aboutGroup.add(licenseRow);
+
         const pageSupport = new Adw.PreferencesPage({
             title: 'Suporte',
             iconName: 'help-browser-symbolic',
